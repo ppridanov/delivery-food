@@ -17,10 +17,11 @@ const authModal = document.querySelector('.modal-auth');
 const closeAuthModal = document.querySelector('.close-auth');
 const loginForm = document.querySelector('#logInForm')
 const loginInput = document.querySelector('#login');
+const passInput = document.querySelector('#password');
 const userName = document.querySelector('.user-name');
 const logOutButton = document.querySelector('.button-out');
 
-let login = '';
+let login = localStorage.getItem('deliveryLogin');
 
 //Функции
 function toggleAuthModal() {
@@ -29,11 +30,12 @@ function toggleAuthModal() {
 
 function authorized() {
   function logOut() {
-    login = '';
+    login = null;
     authButton.style.display = '';
     logOutButton.style.display = '';
     userName.style.display = '';
     logOutButton.removeEventListener('click', logOut);
+    localStorage.removeItem('deliveryLogin');
     checkAuth();
   }
 
@@ -52,9 +54,12 @@ function authorized() {
 function notAuthorized() {
   console.log('You not authorized user');
 
-  function logIn(event) {
-    event.preventDefault();
+
+  function logIn() {
     login = loginInput.value;
+
+    localStorage.setItem('deliveryLogin', login);
+
     authButton.removeEventListener('click', toggleAuthModal);
     closeAuthModal.removeEventListener('click', toggleAuthModal);
     loginForm.removeEventListener('submit', logIn);
@@ -63,10 +68,23 @@ function notAuthorized() {
     checkAuth();
   }
 
+  function checkValidity() {
+    console.log(loginInput.value.length);
+    if (loginInput.value.length < 2 || loginInput.value.length > 30) {
+      alert('Введите логин');
+    } else if (passInput.value.length < 6) {
+      alert('Введите пароль');
+    } else {
+      logIn();
+    }
+  }
 
   authButton.addEventListener('click', toggleAuthModal);
   closeAuthModal.addEventListener('click', toggleAuthModal);
-  loginForm.addEventListener('submit', logIn);
+  loginForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    checkValidity();
+  });
 }
 
 function checkAuth() {
